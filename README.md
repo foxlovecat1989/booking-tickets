@@ -13,6 +13,8 @@ A gRPC-based ticket management system built with Go, following standard Go proje
 - **Structured Logging**: Configurable logging with different levels and formats
 - **Transaction Management**: Robust database transaction handling
 - **Protocol Buffer Development**: Automated code generation with cleanup
+- **Ticket Limits**: Maximum 3 tickets per order to prevent hoarding
+- **Input Validation**: Comprehensive request validation with clear error messages
 
 ## 🏗️ Project Structure
 
@@ -54,6 +56,7 @@ tickets/
 - **Structured Logging**: Configurable logging with Logrus
 - **Configuration Management**: Environment-based configuration
 - **Server Setup**: Database connection and migration initialization
+- **Business Rules**: Ticket limits (max 3 per order) and comprehensive validation
 
 ### 🔄 Planned Services
 - **gRPC Server**: ✅ Server now starts and listens on configured port
@@ -141,9 +144,17 @@ The system defines a gRPC API with the following endpoints:
 CreateOrderRequest {
   user_id: 1
   concert_session_id: 1
-  number_of_tickets: 2
+  number_of_tickets: 2  // Must be between 1-3
 }
 ```
+
+### Request Validation Rules
+- **user_id**: Must be a positive integer
+- **concert_session_id**: Must be a positive integer
+- **number_of_tickets**: Must be between 1 and 3 (inclusive)
+  - Minimum: 1 ticket per order
+  - Maximum: 3 tickets per order
+  - Prevents ticket hoarding and ensures fair distribution
 
 ### Example gRPC Response
 ```protobuf
@@ -155,6 +166,20 @@ CreateOrderResponse {
   created_at: "2024-12-31T20:00:00Z"
 }
 ```
+
+### Error Handling
+
+The API provides clear error messages for validation failures:
+
+#### Validation Errors (codes.InvalidArgument)
+- `"user_id must be positive"` - When user_id is zero or negative
+- `"concert_session_id must be positive"` - When concert_session_id is zero or negative
+- `"number_of_tickets must be positive"` - When number_of_tickets is zero or negative
+- `"maximum 3 tickets allowed per order"` - When requesting more than 3 tickets
+
+#### Business Logic Errors
+- `"concert session not found"` (codes.NotFound) - When the specified session doesn't exist
+- `"no tickets available"` (codes.ResourceExhausted) - When no tickets are available for the session
 
 ## 🔧 Development
 
@@ -239,10 +264,10 @@ make test-migrations
 ### Test Coverage
 
 The project includes comprehensive test coverage:
-- **Unit Tests**: 65 tests covering models, config, and logger
-- **Integration Tests**: 24 tests covering repository and service layers
-- **gRPC Handler Tests**: 12 tests covering API endpoints
-- **Total**: 101 tests with detailed coverage reporting
+- **Unit Tests**: 45 tests covering models, config, and logger
+- **Integration Tests**: 25 tests covering repository and service layers
+- **gRPC Handler Tests**: 15 tests covering API endpoints
+- **Total**: 121 tests with detailed coverage reporting
 
 ## ⚙️ Configuration
 

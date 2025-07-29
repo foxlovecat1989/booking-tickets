@@ -45,6 +45,9 @@ func (h *GRPCHandler) CreateOrder(ctx context.Context, req *api.CreateOrderReque
 	if req.NumberOfTickets <= 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "number_of_tickets must be positive")
 	}
+	if req.NumberOfTickets > 3 {
+		return nil, status.Errorf(codes.InvalidArgument, "maximum 3 tickets allowed per order")
+	}
 
 	// Convert gRPC request to service request
 	serviceReq := &service.CreateOrderRequest{
@@ -69,6 +72,10 @@ func (h *GRPCHandler) CreateOrder(ctx context.Context, req *api.CreateOrderReque
 			return nil, status.Errorf(codes.ResourceExhausted, "no tickets available")
 		case "request cannot be nil":
 			return nil, status.Errorf(codes.InvalidArgument, "request cannot be nil")
+		case "number of tickets must be greater than 0":
+			return nil, status.Errorf(codes.InvalidArgument, "number_of_tickets must be positive")
+		case "maximum 3 tickets allowed per order":
+			return nil, status.Errorf(codes.InvalidArgument, "maximum 3 tickets allowed per order")
 		default:
 			return nil, status.Errorf(codes.Internal, "failed to create order: %v", err)
 		}

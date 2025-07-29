@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/jmoiron/sqlx"
 	models "tickets/internal/models/domain"
 )
 
@@ -32,4 +33,21 @@ func (r *TicketRepository) GetAvailableTicketsBySessionID(sessionID int, numberO
 	}
 
 	return tickets, nil
+}
+
+// UpdateTicketStatuses updates the status of multiple tickets
+func (r *TicketRepository) UpdateTicketStatuses(tx *sqlx.Tx, tickets []models.Ticket, status string) error {
+	query := `
+	UPDATE tickets 
+	SET status = $1 
+	WHERE id = $2`
+
+	for _, ticket := range tickets {
+		_, err := tx.Exec(query, status, ticket.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

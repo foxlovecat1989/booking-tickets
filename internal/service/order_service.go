@@ -49,6 +49,14 @@ func (s *OrderService) CreateOrder(req *CreateOrderRequest) (*CreateOrderRespons
 		return nil, errors.New("request cannot be nil")
 	}
 
+	// Validate number of tickets is within valid range
+	if req.NumberOfTickets <= 0 {
+		return nil, errors.New("number of tickets must be greater than 0")
+	}
+	if req.NumberOfTickets > 3 {
+		return nil, errors.New("maximum 3 tickets allowed per order")
+	}
+
 	var order *models.Order
 	var tickets []models.Ticket
 
@@ -79,28 +87,15 @@ func (s *OrderService) CreateOrder(req *CreateOrderRequest) (*CreateOrderRespons
 		}
 
 		// Create order in database
-		query := `
-			INSERT INTO orders (status, total_price) 
-			VALUES ($1, $2) 
-			RETURNING id, created_at, status, total_price`
-		var createdAt int64
-		err = tx.QueryRow(query, order.Status, order.TotalPrice).Scan(
-			&order.ID, &createdAt, &order.Status, &order.TotalPrice)
+		err = s.orderRepo.CreateOrder(tx, order)
 		if err != nil {
 			return err
 		}
-		order.CreatedAt = createdAt
 
 		// Update ticket statuses to 'pending'
-		for _, ticket := range tickets {
-			updateQuery := `
-			UPDATE tickets 
-			SET status = $1 
-			WHERE id = $2`
-			_, err = tx.Exec(updateQuery, "pending", ticket.ID)
-			if err != nil {
-				return err
-			}
+		err = s.ticketRepo.UpdateTicketStatuses(tx, tickets, "pending")
+		if err != nil {
+			return err
 		}
 
 		return nil

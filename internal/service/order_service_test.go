@@ -60,6 +60,7 @@ func TestOrderService_CreateOrder_InvalidSessionID(t *testing.T) {
 	req := &CreateOrderRequest{
 		UserID:           1,
 		ConcertSessionID: 999, // Non-existent session
+		NumberOfTickets:  1,
 	}
 
 	resp, err := orderService.CreateOrder(req)
@@ -78,6 +79,7 @@ func TestOrderService_CreateOrder_NoTicketsAvailable(t *testing.T) {
 	req := &CreateOrderRequest{
 		UserID:           1,
 		ConcertSessionID: 1,
+		NumberOfTickets:  1,
 	}
 
 	// This test will fail if there are tickets available
@@ -137,6 +139,42 @@ func TestOrderService_CreateOrder_InvalidRequest(t *testing.T) {
 				ConcertSessionID: -1,
 			},
 			expectError: true,
+		},
+		{
+			name: "exceeds maximum tickets limit",
+			request: &CreateOrderRequest{
+				UserID:           1,
+				ConcertSessionID: 1,
+				NumberOfTickets:  4,
+			},
+			expectError: true,
+		},
+		{
+			name: "zero number of tickets",
+			request: &CreateOrderRequest{
+				UserID:           1,
+				ConcertSessionID: 1,
+				NumberOfTickets:  0,
+			},
+			expectError: true,
+		},
+		{
+			name: "negative number of tickets",
+			request: &CreateOrderRequest{
+				UserID:           1,
+				ConcertSessionID: 1,
+				NumberOfTickets:  -1,
+			},
+			expectError: true,
+		},
+		{
+			name: "maximum allowed tickets (3)",
+			request: &CreateOrderRequest{
+				UserID:           1,
+				ConcertSessionID: 1,
+				NumberOfTickets:  3,
+			},
+			expectError: false,
 		},
 	}
 

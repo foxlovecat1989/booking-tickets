@@ -171,6 +171,12 @@ func TestGRPCHandler_CreateOrder_InvalidNumberOfTickets(t *testing.T) {
 			expectCode:  codes.InvalidArgument,
 			expectError: "number_of_tickets must be positive",
 		},
+		{
+			name:        "exceeds maximum tickets limit",
+			numTickets:  4,
+			expectCode:  codes.InvalidArgument,
+			expectError: "maximum 3 tickets allowed per order",
+		},
 	}
 
 	for _, tc := range testCases {
