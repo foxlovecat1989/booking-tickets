@@ -1,0 +1,55 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: tickets_postgres
+    environment:
+      POSTGRES_DB: tickets_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./reset-db.sh:/docker-entrypoint-initdb.d/reset-db.sh
+    networks:
+      - tickets_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tickets_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Go API Application
+  api:
+    build:
+      context: ..
+      dockerfile: deployments/Dockerfile
+    container_name: tickets_api
+    environment:
+      - PORT=8080
+      - GIN_MODE=release
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=password
+      - DATABASE_DBNAME=tickets_db
+      - DATABASE_URL=postgres://postgres:password@postgres:5432/tickets_db?sslmode=disable
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - tickets_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  tickets_network:
+    driver: bridge

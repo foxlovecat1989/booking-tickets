@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package tickets;
+
+option go_package = "tickets/api";
+
+import "google/protobuf/timestamp.proto";
+
+// TicketsService provides ticket and order management functionality
+service TicketsService {
+  // CreateOrder creates a new ticket order
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  
+  // GetOrder retrieves an order by ID
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  
+  // ListOrders retrieves orders for a user
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse);
+  
+  // GetConcertSession retrieves a concert session by ID
+  rpc GetConcertSession(GetConcertSessionRequest) returns (GetConcertSessionResponse);
+  
+  // ListConcertSessions retrieves all concert sessions
+  rpc ListConcertSessions(ListConcertSessionsRequest) returns (ListConcertSessionsResponse);
+  
+  // GetAvailableTickets retrieves available tickets for a session
+  rpc GetAvailableTickets(GetAvailableTicketsRequest) returns (GetAvailableTicketsResponse);
+}
+
+// CreateOrderRequest represents a request to create a new order
+message CreateOrderRequest {
+  int32 user_id = 1;
+  int32 concert_session_id = 2;
+  int32 number_of_tickets = 3;
+}
+
+// CreateOrderResponse represents the response from creating an order
+message CreateOrderResponse {
+  int32 order_id = 1;
+  string status = 2;
+  repeated string ticket_ids = 3;
+  double total_price = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+// GetOrderRequest represents a request to retrieve an order
+message GetOrderRequest {
+  int32 order_id = 1;
+}
+
+// GetOrderResponse represents the response from retrieving an order
+message GetOrderResponse {
+  Order order = 1;
+}
+
+// ListOrdersRequest represents a request to list orders
+message ListOrdersRequest {
+  int32 user_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+// ListOrdersResponse represents the response from listing orders
+message ListOrdersResponse {
+  repeated Order orders = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+// GetConcertSessionRequest represents a request to retrieve a concert session
+message GetConcertSessionRequest {
+  int32 session_id = 1;
+}
+
+// GetConcertSessionResponse represents the response from retrieving a concert session
+message GetConcertSessionResponse {
+  ConcertSession session = 1;
+}
+
+// ListConcertSessionsRequest represents a request to list concert sessions
+message ListConcertSessionsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+// ListConcertSessionsResponse represents the response from listing concert sessions
+message ListConcertSessionsResponse {
+  repeated ConcertSession sessions = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+// GetAvailableTicketsRequest represents a request to get available tickets
+message GetAvailableTicketsRequest {
+  int32 session_id = 1;
+  int32 limit = 2;
+}
+
+// GetAvailableTicketsResponse represents the response from getting available tickets
+message GetAvailableTicketsResponse {
+  repeated Ticket tickets = 1;
+  int32 total_available = 2;
+}
+
+// Order represents an order in the system
+message Order {
+  int32 id = 1;
+  string status = 2;
+  double total_price = 3;
+  google.protobuf.Timestamp created_at = 4;
+  repeated OrderItem items = 5;
+}
+
+// OrderItem represents an item in an order
+message OrderItem {
+  int32 id = 1;
+  string ticket_id = 2;
+  double price = 3;
+  Ticket ticket = 4;
+}
+
+// ConcertSession represents a concert session
+message ConcertSession {
+  int32 id = 1;
+  int32 concert_id = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  string venue = 5;
+  int32 number_of_seats = 6;
+  double price = 7;
+  Concert concert = 8;
+}
+
+// Concert represents a concert
+message Concert {
+  int32 id = 1;
+  string name = 2;
+  string location = 3;
+  string description = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+// Ticket represents a ticket
+message Ticket {
+  string id = 1;
+  int32 session_id = 2;
+  string status = 3;
+} 

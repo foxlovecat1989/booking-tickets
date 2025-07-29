@@ -22,8 +22,153 @@
 go.work
 go.work.sum
 
-# env file
+# Build artifacts
+bin/
+main
+tickets
+server
+migrate.exe
+client
+
+# Coverage reports
+coverage.html
+coverage.out
+
+# Environment files
 .env
+.env.local
+.env.*.local
 
 # IDE specific files
 .idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+.dockerignore
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Generated protobuf files (if you want to ignore them)
+# Note: Currently keeping these in version control for easier development
+# proto/*.pb.go
+# proto/*_grpc.pb.go
+
+# Migration files (if you want to ignore generated migrations)
+# Note: Currently keeping all migrations in version control
+# migrations/*_generated_*.sql
+
+# Test data files
+testdata/
+*.testdata
+
+# Documentation build artifacts
+docs/_build/
+docs/.doctrees/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Archive files
+*.tar.gz
+*.zip
+*.rar
+
+# Local configuration overrides
+config.local.yaml
+config.dev.yaml
+config.prod.yaml
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# Node.js (if using any frontend tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (if using any Python tools)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Java (if using any Java tools)
+*.class
+*.jar
+*.war
+*.ear
+target/
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Gradle
+.gradle/
+gradlew
+gradlew.bat
+
+# Project-specific ignores
+# Database dumps
+*.sql.dump
+*.sql.backup
+
+# Local development files
+local/
+dev/
+prod/
+
+# Performance profiling
+*.prof
+*.pprof
+
+# Project-specific ignores
+# Database dumps
+*.sql.dump
+*.sql.backup
+
+# Local development files
+local/
+dev/
+prod/
+
+# Performance profiling
+*.prof
+*.pprof
